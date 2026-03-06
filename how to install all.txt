@@ -1,0 +1,40 @@
+py -3.11 -m venv clean_venv
+
+python -m pip install torch==2.0.0+cpu torchvision==0.15.1+cpu torchaudio==2.0.1+cpu --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -U openmim
+python -m pip install "mmengine==0.10.7"
+python -m mim install "mmcv==2.1.0"
+
+git clone https://github.com/open-mmlab/mmdetection.git
+cd mmdetection
+python -m pip install -v -e . --no-build-isolation
+python -m pip install numpy==1.26.4
+
+mim download mmdet --config rtmdet_tiny_8xb32-300e_coco --dest .
+
+
+Выполните инференц ранее загруженной модели на тестовой картинке из репозитория,
+ если вы использовали установку с видеокартой, то замените в команде ниже с --device cpu на --device cuda. 
+python demo/image_demo.py demo/demo.jpg rtmdet_tiny_8xb32-300e_coco.py --weights rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth --device cpu
+
+
+mkdir checkpoints
+
+Как установит модель в конфиг mdetection 
+mim download mmdet --config faster-rcnn_r50_fpn_1x_coco --dest checkpoints
+
+Запуск демо
+python demo/image_demo.py demo/demo.jpg configs/faster_rcnn/faster-rcnn_r50_fpn_1x_coco.py --weights checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth --device cpu --out-dir demo_output
+
+Как скачать веса
+mim download mmdet --config fcos_r50-caffe_fpn_gn-head_1x_coco --dest .
+
+img = 'C:\\Users\\Admin\\NEIRO\\SPR_5_FIN\\mmdetection\\datasets\\minecraft\\valid\\tree-extracted00045_png.rf.cb6c69fe62a53e198b7c6d0d0aa99bb6.jpg'
+
+
+python demo/image_demo.py datasets/minecraft/valid/tree-extracted00045_png.rf.cb6c69fe62a53e198b7c6d0d0aa99bb6.jpg configs/fcos/fcos_minecraft.py --weights checkpoints/fcos_r50_caffe_fpn_gn-head_1x_coco-821213aa.pth --device cpu --out-dir artifacts/inference
+
+python configs/fcos/fcos_minecraft.py datasets/minecraft/valid/tree-extracted00045_png.rf.cb6c69fe62a53e198b7c6d0d0aa99bb6.jpg configs/fcos/fcos_minecraft.py --weights checkpoints/fcos_r50_caffe_fpn_gn-head_1x_coco-821213aa.pth --device cpu --out-dir artifacts/inference
+
+
+python demo/image_demo.py datasets/minecraft/valid/tree-extracted00045_png.rf.cb6c69fe62a53e198b7c6d0d0aa99bb6.jpg configs/fcos/fcos_minecraft.py --weights checkpoints/fcos_r50_caffe_fpn_gn-head_1x_coco-821213aa.pth --device cpu --out-dir artifacts/inference --texts "bee . chicken . cow . creeper . enderman . fox . frog . ghast . goat . llama . pig . sheep . skeleton . spider . turtle . wolf . zombie" -c
